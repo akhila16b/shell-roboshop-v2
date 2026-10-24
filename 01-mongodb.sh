@@ -19,3 +19,5 @@ validate $? "Updating remote connections to MongoDB"
 
 systemctl restart mongod
 validate $? "Restarting MongoDB"
+
+total_time
