@@ -34,3 +34,8 @@ validate(){
         echo -e "${2}..${G}SUCCESS${N}" | tee -a $logs_file
     fi
 }
+
+total_time(){
+    echo -e "$(timestamp) [INFO] Script completed in $SECONDS seconds" | tee -a $logs_file
+    echo -e "$(timestamp) [INFO] ==== Script completed Execution =====" | tee -a $logs_file    
+}
