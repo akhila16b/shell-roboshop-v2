@@ -17,12 +17,12 @@ check_root() {
 
 mkdir -p $logs_folder
 
-# timestamp=$(){
-#     date +"%F %T"
-# }
+timestamp(){
+    date +"%F %T"
+}
 
- #echo "Scipt started execution at $(date + "%F %T")" &>> $logs_file
- echo "Script started execution at $(date +"%F %T")" &>> $logs_file
+
+echo "Script started execution at $(date +"%F %T")" &>> $logs_file
 
 validate(){
     if [ $1 -ne 0 ]; then
