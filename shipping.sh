@@ -1,5 +1,6 @@
 #!/bin/bash
 
+app_name=shipping
 source ./common.sh
 check_root
 
