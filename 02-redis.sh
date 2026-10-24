@@ -5,8 +5,6 @@ source ./common.sh
 
 check_root
 
-
-
 dnf module disable redis -y &>> $logs_file
 dnf module enable redis:7 -y &>> $logs_file
 dnf install redis -y &>> $logs_file

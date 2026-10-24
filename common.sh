@@ -21,8 +21,10 @@ timestamp(){
     date +"%F %T"
 }
 
+mkdir -p $logs_folder
 
-echo "Script started execution at $(date +"%F %T")" &>> $logs_file
+echo -e "$(timestamp) [INFO] ==== Script started Execution =====" | tee -a $logs_file
+
 
 validate(){
     if [ $1 -ne 0 ]; then
