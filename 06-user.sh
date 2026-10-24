@@ -10,5 +10,3 @@ systemd_setup
 
 restart
 total_time
-
-
