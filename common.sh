@@ -10,30 +10,27 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-check_root() {
+check_root(){
     if [ $user_id -ne 0 ]; then
         echo "Please run this script with sudo access.."
         exit 1
     fi
 }
 
-mkdir -p $logs_folder
-
 timestamp(){
-    date +"%F %T"
+    date "+%F %T" 
 }
 
 mkdir -p $logs_folder
 
 echo -e "$(timestamp) [INFO] ==== Script started Execution =====" | tee -a $logs_file
 
-
 validate(){
     if [ $1 -ne 0 ]; then
-        echo -e "${2}..${R}FAILED${N}" | tee -a $logs_file
+        echo -e "$(timestamp) [ERROR] ${2}..${R}FAILED${N}" | tee -a $logs_file
         exit 1
     else
-        echo -e "${2}..${G}SUCCESS${N}" | tee -a $logs_file
+        echo -e "$(timestamp) [INFO] ${2}..${G}SUCCESS${N}" | tee -a $logs_file
     fi
 }
 
@@ -45,6 +42,38 @@ nodejs_setup(){
 
     npm install &>> $logs_file
     validate $? "Installing dependencies"
+}
+
+java_setup(){
+    dnf module enable maven:3.9 -y &>> $logs_file
+    dnf install maven java-25-openjdk-devel -y &>> $logs_file
+    validate $? "Installing Java and Maven"
+
+    alternatives --set java "/usr/lib/jvm/java-25-openjdk/bin/java"
+    validate $? "Setting Java 25 as default Java version"
+
+    echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f /usr/bin/java)))" > /etc/profile.d/java.sh
+    source /etc/profile.d/java.sh
+    echo $JAVA_HOME
+    validate $? "Setting JAVA_HOME for maven"
+
+    mvn clean package &>> $logs_file
+    validate $? "Installing dependencies"
+
+    mv target/shipping.jar shipping.jar
+    validate $? "Moving shipping.jar file"
+}
+
+python_setup(){
+    dnf install python3.14 python3.14-pip -y &>> $logs_file
+    validate $? "Installing Python 3.14"
+
+    python3.14 -m venv /app/.venv &>> $logs_file
+    validate $? "Creating virtual environment"
+
+    /app/.venv/bin/pip install -r requirements.txt &>> $logs_file
+    validate $? "Installing dependencies"
+
 }
 
 app_setup(){
@@ -62,12 +91,12 @@ app_setup(){
     mkdir -p /app
     validate $? "Creating app directory"
 
-    curl -L -o /tmp/catalogue.zip https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/catalogue-v4.zip &>> $logs_file
-    validate $? "Downloading catalogue"
+    curl -L -o "/tmp/$app_name.zip" "https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/$app_name-v4.zip" &>> $logs_file
+    validate $? "Downloading $app_name"
 
     cd /app
-    unzip /tmp/catalogue.zip &>> $logs_file
-    validate $? "Unzipping catalogue"
+    unzip "/tmp/$app_name.zip" &>> $logs_file
+    validate $? "Unzipping $app_name"
 }
 
 systemd_setup(){
